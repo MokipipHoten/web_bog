@@ -1,0 +1,33 @@
+yaml
+name: GH VPS
+
+on:
+  workflow_dispatch:
+
+jobs:
+  vps:
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Update
+      run: sudo apt update -y
+
+    - name: Install SSH
+      run: |
+        sudo apt install openssh-server -y
+        sudo service ssh start
+
+    - name: Set Password
+      run: |
+        echo "runner:123456" | sudo chpasswd
+
+    - name: Install Cloudflare Tunnel
+      run: |
+        wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
+        chmod +x cloudflared-linux-amd64
+
+    - name: Start Tunnel
+      run: |
+        ./cloudflared-linux-amd64 tunnel --url ssh://localhost:22
+        
